@@ -73,7 +73,7 @@ impl<const N: usize> Geometry for Polygon<N> {
         let first = axis.dot(self.0[0]);
         let mut proj = Projection::new(first, first);
 
-        for v in self.0.iter() {
+        for v in self.0[1..].iter() {
             let p = axis.dot(*v);
 
             if p < proj.min {
