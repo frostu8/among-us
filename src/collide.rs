@@ -101,7 +101,7 @@ impl<const N: usize> Geometry for Polygon<N> {
             let edge = next - this;
             let normal = Vector2::new(-edge.y, edge.x);
 
-            vec.push(normal);
+            vec.push(normal.normalize());
         }
 
         vec
