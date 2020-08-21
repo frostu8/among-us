@@ -117,7 +117,26 @@ impl Geometry for Circle {
 }
 
 /// A closed polygon with `N` vertices.
+#[derive(Clone)]
 pub struct Polygon(Vec<Vector2>);
+
+impl Polygon {
+    /// Create a new polygon.
+    pub fn new() -> Polygon {
+        Polygon(Vec::new())
+    }
+
+    /// Push a vertex to the polygon.
+    pub fn push(&mut self, vertex: Vector2) {
+        self.0.push(vertex)
+    }
+}
+
+impl From<Vec<Vector2>> for Polygon {
+    fn from(vec: Vec<Vector2>) -> Polygon {
+        Polygon(vec)
+    }
+}
 
 impl Geometry for Polygon {
     fn project(&self, axis: Vector2) -> Projection {
