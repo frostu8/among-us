@@ -5,7 +5,7 @@ use crate::math::*;
 /// This gaurentees that `start` is less than `end`.
 pub struct Projection {
     start: FLOAT,
-    end:   FLOAT,
+    end: FLOAT,
 }
 
 impl Projection {
@@ -69,12 +69,19 @@ pub trait Geometry: Sized {
     ///
     /// These vectors should be normalized.
     fn axis<T>(&self, other: &T) -> Vec<Vector2>
-    where T: Geometry;
+    where
+        T: Geometry;
 
     /// Collide two objects together, returning true if they collide.
-    fn collide<T>(&self, other: &T) -> bool 
-    where T: Geometry {
-        for a in self.axis(other).into_iter().chain(other.axis(self).into_iter()) {
+    fn collide<T>(&self, other: &T) -> bool
+    where
+        T: Geometry,
+    {
+        for a in self
+            .axis(other)
+            .into_iter()
+            .chain(other.axis(self).into_iter())
+        {
             if !self.project(a).overlap(&other.project(a)) {
                 return false;
             }
@@ -111,8 +118,14 @@ impl Geometry for Circle {
     }
 
     fn axis<T>(&self, other: &T) -> Vec<Vector2>
-    where T: Geometry {
-        other.vertices().iter().map(|v| (self.center - v).normalize()).collect()
+    where
+        T: Geometry,
+    {
+        other
+            .vertices()
+            .iter()
+            .map(|v| (self.center - v).normalize())
+            .collect()
     }
 }
 
@@ -142,7 +155,11 @@ impl Geometry for Polygon {
     fn project(&self, axis: Vector2) -> Projection {
         let mut iter = self.0.iter();
 
-        let first = axis.dot(*iter.next().expect("polygons with zero points are not supported"));
+        let first = axis.dot(
+            *iter
+                .next()
+                .expect("polygons with zero points are not supported"),
+        );
         let mut proj = Projection::new(first, first);
 
         for v in iter {
@@ -163,10 +180,16 @@ impl Geometry for Polygon {
     }
 
     fn axis<T>(&self, _other: &T) -> Vec<Vector2>
-    where T: Geometry {
-        self.0.iter()
+    where
+        T: Geometry,
+    {
+        self.0
+            .iter()
             .zip(self.0.iter().skip(1))
-            .map(|v| { let edge = v.1 - v.0; Vector2::new(-edge.y, edge.x).normalize() })
+            .map(|v| {
+                let edge = v.1 - v.0;
+                Vector2::new(-edge.y, edge.x).normalize()
+            })
             .collect()
     }
 }
