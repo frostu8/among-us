@@ -4,7 +4,12 @@ version = "0.1.0"
 authors = ["Dante Helmore <frostu8@protonmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "An Among Us clone made in Rust."
+readme = "README.md"
+repository = "https://github.com/frostu8/among-us"
+
+license = "Unlicense"
+license-file = "UNLICENSE"
 
 [dependencies]
 cgmath = "0.17"
