@@ -1,15 +1,49 @@
 use crate::math::*;
 
 /// A projection is a segment on an axis, represented by two numbers.
+///
+/// This gaurentees that `start` is less than `end`.
 pub struct Projection {
-    pub min: FLOAT,
-    pub max: FLOAT,
+    start: FLOAT,
+    end:   FLOAT,
 }
 
 impl Projection {
-    /// Create a new projection.
-    fn new(min: FLOAT, max: FLOAT) -> Projection {
-        Projection { min, max }
+    /// Create a new projection from a start and end value.
+    pub fn new(mut start: FLOAT, mut end: FLOAT) -> Projection {
+        if start > end {
+            std::mem::swap(&mut start, &mut end);
+        }
+
+        Projection { start, end }
+    }
+
+    /// The start point.
+    pub fn start(&self) -> FLOAT {
+        self.start
+    }
+
+    /// The end point.
+    pub fn end(&self) -> FLOAT {
+        self.end
+    }
+
+    /// Set the start point.
+    pub fn set_start(&mut self, start: FLOAT) {
+        self.start = start;
+
+        if self.start > self.end {
+            std::mem::swap(&mut self.start, &mut self.end);
+        }
+    }
+
+    /// Set the end point.
+    pub fn set_end(&mut self, end: FLOAT) {
+        self.end = end;
+
+        if self.end < self.start {
+            std::mem::swap(&mut self.start, &mut self.end);
+        }
     }
 }
 
@@ -76,10 +110,10 @@ impl<const N: usize> Geometry for Polygon<N> {
         for v in self.0[1..].iter() {
             let p = axis.dot(*v);
 
-            if p < proj.min {
-                proj.min = p;
-            } else if p > proj.max {
-                proj.max = p;
+            if p < proj.start() {
+                proj.set_start(p);
+            } else if p > proj.end() {
+                proj.set_end(p);
             }
         }
 
