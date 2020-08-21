@@ -45,6 +45,11 @@ impl Projection {
             std::mem::swap(&mut self.start, &mut self.end);
         }
     }
+
+    /// Check if there is a overlap between two projections.
+    pub fn overlap(&self, other: &Projection) -> bool {
+        !(self.start > other.end || self.end < other.start)
+    }
 }
 
 /// Geometry is any shape that can collide.
@@ -53,7 +58,7 @@ impl Projection {
 /// collision and ruin your life.
 ///
 /// Geometry does not mean that the shape can be translated, rotated or scaled.
-pub trait Geometry {
+pub trait Geometry: Sized {
     /// Project this geometry onto an axis.
     fn project(&self, axis: Vector2) -> Projection;
 
@@ -65,6 +70,18 @@ pub trait Geometry {
     /// These vectors should be normalized.
     fn axis<T>(&self, other: &T) -> Vec<Vector2>
     where T: Geometry;
+
+    /// Collide two objects together, returning true if they collide.
+    fn collide<T>(&self, other: &T) -> bool 
+    where T: Geometry {
+        for a in self.axis(other).into_iter().chain(other.axis(self).into_iter()) {
+            if !self.project(a).overlap(&other.project(a)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
 
 /// A circle.
