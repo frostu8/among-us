@@ -48,7 +48,7 @@ impl Projection {
 
     /// Check if there is a overlap between two projections.
     pub fn overlap(&self, other: &Projection) -> bool {
-        !(self.start > other.end || self.end < other.start)
+        !(self.start >= other.end || self.end <= other.start)
     }
 }
 
