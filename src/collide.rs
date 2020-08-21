@@ -87,7 +87,7 @@ pub trait Geometry: Sized {
             }
         }
 
-        return true;
+        true
     }
 }
 
