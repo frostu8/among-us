@@ -100,14 +100,16 @@ impl Geometry for Circle {
 }
 
 /// A closed polygon with `N` vertices.
-pub struct Polygon<const N: usize>([Vector2; N]);
+pub struct Polygon(Vec<Vector2>);
 
-impl<const N: usize> Geometry for Polygon<N> {
+impl Geometry for Polygon {
     fn project(&self, axis: Vector2) -> Projection {
-        let first = axis.dot(self.0[0]);
+        let mut iter = self.0.iter();
+
+        let first = axis.dot(*iter.next().expect("polygons with zero points are not supported"));
         let mut proj = Projection::new(first, first);
 
-        for v in self.0[1..].iter() {
+        for v in iter {
             let p = axis.dot(*v);
 
             if p < proj.start() {
@@ -126,18 +128,9 @@ impl<const N: usize> Geometry for Polygon<N> {
 
     fn axis<T>(&self, _other: &T) -> Vec<Vector2>
     where T: Geometry {
-        let mut vec = Vec::<Vector2>::with_capacity(self.0.len());
-
-        for i in 0..self.0.len() {
-            let this = self.0[i];
-            let next = self.0[(i + 1) % self.0.len()];
-
-            let edge = next - this;
-            let normal = Vector2::new(-edge.y, edge.x);
-
-            vec.push(normal.normalize());
-        }
-
-        vec
+        self.0.iter()
+            .zip(self.0.iter().skip(1))
+            .map(|v| { let edge = v.1 - v.0; Vector2::new(-edge.y, edge.x).normalize() })
+            .collect()
     }
 }
