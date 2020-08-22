@@ -50,6 +50,11 @@ impl Projection {
     pub fn overlap(&self, other: &Projection) -> bool {
         !(self.start >= other.end || self.end <= other.start)
     }
+
+    /// Check if `self` contains another projection.
+    pub fn contains(&self, other: &Projection) -> bool {
+        self.start <= other.start && self.end >= other.end
+    }
 }
 
 /// Geometry is any shape that can collide.
