@@ -77,22 +77,14 @@ pub trait Geometry: Sized {
     where
         T: Geometry;
 
-    /// Collide two objects together, returning true if they collide.
+    /// Collide two objects together, returning true if they collide
     fn collide<T>(&self, other: &T) -> bool
     where
         T: Geometry,
     {
-        for a in self
-            .axis(other)
-            .into_iter()
+        self.axis(other).into_iter()
             .chain(other.axis(self).into_iter())
-        {
-            if !self.project(a).overlap(&other.project(a)) {
-                return false;
-            }
-        }
-
-        true
+            .all(|p| self.project(p).overlap(&other.project(p)))
     }
 
     /// Contain one object within the other, returning true if the shape is
