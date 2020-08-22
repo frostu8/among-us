@@ -94,6 +94,17 @@ pub trait Geometry: Sized {
 
         true
     }
+
+    /// Contain one object within the other, returning true if the shape is
+    /// contained within the container shape.
+    fn contain<T>(&self, other: &T) -> bool
+    where
+        T: Geometry,
+    {
+        self.axis(other).into_iter()
+            .chain(other.axis(self).into_iter())
+            .all(|p| self.project(p).contains(&other.project(p)))
+    }
 }
 
 /// A circle.
