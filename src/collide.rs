@@ -161,26 +161,18 @@ impl From<Vec<Vector2>> for Polygon {
 
 impl Geometry for Polygon {
     fn project(&self, axis: Vector2) -> Projection {
-        let mut iter = self.0.iter();
+        let mut iter = self.0.iter().map(|v| axis.dot(*v));
+        let first = iter.next().expect("polygons with zero points are not supported!");
 
-        let first = axis.dot(
-            *iter
-                .next()
-                .expect("polygons with zero points are not supported"),
-        );
-        let mut proj = Projection::new(first, first);
-
-        for v in iter {
-            let p = axis.dot(*v);
-
-            if p < proj.start() {
-                proj.set_start(p);
-            } else if p > proj.end() {
-                proj.set_end(p);
+        iter.fold(Projection::new(first, first), |mut proj, x| {
+            if x < proj.start() {
+                proj.set_start(x)
+            } else if x > proj.end() {
+                proj.set_end(x)
             }
-        }
 
-        proj
+            proj
+        })
     }
 
     fn vertices(&self) -> &[Vector2] {
