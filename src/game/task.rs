@@ -70,6 +70,61 @@ pub struct TaskInfo {
     pub completion: f32,
 }
 
+/// A task pool.
+///
+/// This pool gaurentees that task IDs will stay consistent until the pool is
+/// cleared, i.e. at the end of a game.
+pub struct TaskPool {
+    pool: Vec<Option<Task>>,
+}
+
+impl TaskPool {
+    /// Index into the `TaskPool` immutably.
+    pub fn get(&self, id: usize) -> Option<&Task> {
+        self.pool.get(id)?.into()
+    }
+
+    /// Index into the `TaskPool` mutably.
+    pub fn get_mut(&mut self, id: usize) -> Option<&mut Task> {
+        self.pool.get_mut(id)?.into()
+    }
+
+    /// Insert a task with an id.
+    ///
+    /// Returns the old task that was in its place, or `None` if there was no
+    /// task in its place.
+    pub fn insert_with(&mut self, task: Task, id: usize) -> Option<Task> {
+        if id >= self.pool.len() {
+            // allocate memory to add the Task
+            self.pool.extend((0..=(self.pool.len() - id)).map(|_| None))
+        }
+
+        std::mem::replace(&mut self.pool[id], Some(task))
+    }
+
+    /// Insert at the first empty task id.
+    ///
+    /// Returns the id of the new task. 
+    pub fn insert(&mut self, task: Task) -> usize {
+        let id = self.first_empty();
+
+        self.insert_with(task, id);
+        id
+    }
+
+    /// Clears the pool.
+    pub fn clear(&mut self) {
+        self.pool.iter_mut().for_each(|t| *t = None);
+    }
+
+    fn first_empty(&self) -> usize {
+        match self.pool.iter().enumerate().find(|(_, t)| t.is_none()) {
+            Some((id, _)) => id,
+            None => self.pool.len(),
+        }
+    }
+}
+
 /// Minigame controller.
 ///
 /// These structs are instantiated once and persist data as long as the same
