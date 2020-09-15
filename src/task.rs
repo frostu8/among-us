@@ -1,12 +1,18 @@
+//! Task interactions.
+//!
 //! Tasks are one of the main gameplay elements of Among Us. They are
 //! fundamentally different to "[`Minigame`]s", which actually drive the tasks.
 //! Tasks hold information about the name of the task, how many steps there are
 //! and where to do the tasks.
 //!
-//! Most tasks are counted towards the task bar at the upper-right corner.
-//! Some tasks are marked as `urgent`, and are displayed with a flashing red
-//! and yellow symbol and text. Besides the initialization, tasks simply need
-//! to sync their completion unless more functionality is desired.
+//! Most tasks are counted towards the task bar at the upper-right corner. Some
+//! tasks use a timer construct, and are displayed with flashing yellow and red
+//! colors. Besides the initialization, tasks simply need to sync their 
+//! completion unless more functionality is desired.
+//!
+//! Tasks are actually part of a task pool detailing all of the tasks in a
+//! single game. This not only allows clients to be more efficient with their
+//! data, but this allows clients to share tasks.
 //!
 //! The spawned `Minigame`s control their task parents. The tasks implement no
 //! functionality themselves, except for helper functions for networking.
@@ -20,6 +26,26 @@ pub struct Task {
 }
 
 impl Task {
+    /// Create a new task.
+    ///
+    /// This uses the minigame's default implementation
+    pub fn new<T>(name: String) -> Task 
+    where T: Minigame + Default + 'static {
+        Task::new_with(name, T::default())
+    }
+
+    /// Create a new task from a [`Minigame`] type.
+    pub fn new_with<T>(name: String, minigame: T) -> Task
+    where T: Minigame + 'static {
+        Task {
+            info: TaskInfo {
+                name,
+                completion: 0.0,
+            },
+            minigame: Box::new(minigame),
+        }
+    }
+
     /// The name of the task.
     pub fn name(&self) -> &str {
         &self.info.name
@@ -54,5 +80,7 @@ pub trait Minigame {
     ///
     /// This is called when the user access a unit to begin the minigame, and
     /// before the minigame is displayed to the user on the screen.
+    ///
+    /// Never called on the server.
     fn begin(&mut self, state: State, task: &mut TaskInfo);
 }
