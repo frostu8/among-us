@@ -45,5 +45,5 @@ pub trait Minigame {
     /// before the minigame is displayed to the user on the screen.
     ///
     /// Never called on the server.
-    fn begin(&mut self, state: State, task: &mut TaskInfo);
+    fn begin(&mut self, state: State, task: &mut Task);
 }
