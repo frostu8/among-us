@@ -40,19 +40,19 @@ where T: AsRef<[u8]> {
         slice.len()
     }
 
-    /// Deserialize a type from the `Cursor`.
-    pub fn deserialize<U>(&mut self) -> Result<U, U::Error> 
-    where U: Deserialize {
-        U::deserialize(self)
+    /// Decode a type from the `Cursor`.
+    pub fn decode<U>(&mut self) -> Result<U, U::Error> 
+    where U: Decode {
+        U::decode(self)
     }
 }
 
-/// A type that can be deserialized from a [`Cursor`].
-pub trait Deserialize: Sized {
+/// A type that can be decoded from a [`Cursor`].
+pub trait Decode: Sized {
     /// Deserialization error type.
     type Error: std::error::Error + 'static;
 
     /// Begin the deserialization.
-    fn deserialize<T>(cursor: &mut Cursor<T>) -> Result<Self, Self::Error>
+    fn decode<T>(cursor: &mut Cursor<T>) -> Result<Self, Self::Error>
     where T: AsRef<[u8]>;
 }
