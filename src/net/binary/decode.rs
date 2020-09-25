@@ -41,40 +41,35 @@ where T: AsRef<[u8]> {
     }
 
     /// Decode a type from the `Cursor`.
-    pub fn decode<U>(&mut self) -> Result<U, Error<U::Error>> 
+    pub fn decode<U>(&mut self) -> Result<U, Error> 
     where U: Decode {
         U::decode(self)
     }
 }
 
 /// An error that can occur during decoding.
-pub enum Error<T>
-where T: std::error::Error + 'static {
+pub enum Error {
     /// An unexpected end to the bytes was reached.
     UnexpectedEnd,
-    /// An error occuring during deserialization from bytes.
-    Deserialize(T),
+    /// A Utf-8 error was found.
+    Utf8(std::str::Utf8Error),
 }
 
-impl<T> Error<T>
-where T: std::error::Error + 'static {
+impl Error {
     /// Create a new unexpected end error.
-    pub fn unexpected_end() -> Error<T> {
+    pub fn unexpected_end() -> Error {
         Error::UnexpectedEnd
     }
 
-    /// Create a new deserialization error.
-    pub fn deserialize(error: T) -> Error<T> {
-        Error::Deserialize(error)
+    /// Create a new Utf8 error.
+    pub fn utf8(error: std::str::Utf8Error) -> Error {
+        Error::Utf8(error)
     }
 }
 
 /// A type that can be decoded from a [`Cursor`].
 pub trait Decode: Sized {
-    /// Deserialization error type.
-    type Error: std::error::Error + 'static;
-
     /// Begin the deserialization.
-    fn decode<T>(cursor: &mut Cursor<T>) -> Result<Self, Error<Self::Error>>
+    fn decode<T>(cursor: &mut Cursor<T>) -> Result<Self, Error>
     where T: AsRef<[u8]>;
 }
