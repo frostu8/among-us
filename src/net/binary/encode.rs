@@ -7,7 +7,7 @@ impl CursorMut {
     /// Create a new, empty `CursorMut`.
     pub fn new() -> CursorMut {
         CursorMut {
-            inner: Vec::with_capacity(512),
+            inner: Vec::new(),
         }
     }
 
