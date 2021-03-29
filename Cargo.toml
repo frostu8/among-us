@@ -9,7 +9,6 @@ readme = "README.md"
 repository = "https://github.com/frostu8/among-us"
 
 license = "Unlicense"
-license-file = "UNLICENSE"
 
 [dependencies]
 sat = { git = "https://github.com/frostu8/sat", tag = "v0.1.0-alpha" }
